@@ -28,13 +28,13 @@ This module installs or uninstalls IBM Installation Manager.
 #### Example
 ```yaml
 - name: Install:
-  ibmim_installer: 
-    state: present 
+  ibmim_installer:
+    state: present
     src: /some/dir/install/
     logdir: /tmp/im_install.log
 
 - name: Uninstall
-  ibmim_installer: 
+  ibmim_installer:
     state: absent
     dest: /opt/IBM/InstallationManager
 ```
@@ -83,7 +83,7 @@ This module creates or removes a WebSphere Application Server Deployment Manager
 |:---------|:--------|:---------|:---------|:---------|
 | state | true | present | present,absent | present=create,absent=remove |
 | wasdir | true | N/A | N/A | Path to installation location of WAS |
-| name | true | N/A | N/A | Name of the profile |
+| profile_name | true | N/A | N/A | Name of the profile |
 | cell_name | true | N/A | N/A | Name of the cell |
 | host_name | true | N/A | N/A | Host Name |
 | node_name | true | N/A | N/A | Node name of this profile |
@@ -93,32 +93,34 @@ This module creates or removes a WebSphere Application Server Deployment Manager
 #### Example
 ```yaml
 - name: Create
-  profile_dmgr: 
-    state: present 
-    wasdir: /usr/local/WebSphere/AppServer/ 
-    name: dmgr 
-    cell_name: devCell 
-    host_name: localhost 
-    node_name: devcell-dmgr 
-    username: admin 
+  profile_dmgr:
+    state: present
+    wasdir: /usr/local/WebSphere/AppServer/
+    profile_name: dmgr
+    cell_name: devCell
+    host_name: localhost
+    node_name: devcell-dmgr
+    username: admin
     password: allyourbasearebelongtous
 
 - name: Remove
-  profile_dmgr: 
-    state: absent 
-    wasdir: /usr/local/WebSphere/AppServer/ 
-    name: dmgr
+  profile_dmgr:
+    state: absent
+    wasdir: /usr/local/WebSphere/AppServer/
+    profile_name: dmgr
 ```
 
 ### profile_nodeagent.py
 This module creates or removes a WebSphere Application Server Node Agent profile. Requires a Network Deployment installation.
+Note wasdir and profile_dir can end with or without a slash
 
 #### Options
 | Parameter | Required | Default | Choices | Comments |
 |:---------|:--------|:---------|:---------|:---------|
-| state | true | present | present,absent | present=create,absent=remove |
+| state | true | present | present,absent,purge | present=create,absent=remove,purge=remove and delete profile dir |
 | wasdir | true | N/A | N/A | Path to installation location of WAS |
-| name | true | N/A | N/A | Name of the profile |
+| profile_name | true | N/A | N/A | Name of the profile |
+| profile_dir | false | wasdir/profiles | N/A | Optional path to profile folder, will use wasdir/profiles if undefined. Useful if your WAS dir is on shared storage and your profile is local |
 | cell_name | true | N/A | N/A | Name of the cell |
 | host_name | true | N/A | N/A | Host Name |
 | node_name | true | N/A | N/A | Node name of this profile |
@@ -127,28 +129,40 @@ This module creates or removes a WebSphere Application Server Node Agent profile
 | dmgr_host | true | N/A | N/A | Host name of the Deployment Manager |
 | dmgr_port | true | N/A | N/A | SOAP port number of the Deployment Manager |
 | federate | false | N/A | N/A | Wether the node should be federated to a cell. If true, cell name cannot be the same as the cell name of the deployment manager. |
+| admin_security | false | true | true, false | Wether admin security should be enabled or disabled (disabled is useful for early dev environments) |
+| template_name | false | managed | N/A | template to be use for profiles |
 
 #### Example
 ```yaml
 - name: Create
-  profile_nodeagent: 
-    state: present 
-    wasdir: /usr/local/WebSphere/AppServer/ 
-    name: nodeagent 
-    cell_name: devCellTmp 
-    host_name: localhost 
-    node_name: devcell-node1 
-    username: admin 
-    password: allyourbasearebelongtous 
-    dmgr_host: localhost 
-    dmgr_port: 8879 
-    federate: true
+  profile_nodeagent:
+    state: 					present
+    wasdir: 				/usr/local/WebSphere/AppServer
+    profile_dir: 		/usr/local/WebSphereProfiles/
+    profile_name: 	nodeagent
+    cell_name: 			devCellTmp
+    host_name: 			localhost
+    node_name: 			devcell-node1
+    username: 			admin
+    password: 			allyourbasearebelongtous
+    dmgr_host: 			localhost
+    dmgr_port: 			8879
+    federate: 			'true'
+    template_name:  managed
+    admin_security: 'true'
 
 - name: Remove
-  profile_dmgr: 
-    state: absent 
-    wasdir: /usr/local/WebSphere/AppServer/ 
-    name: nodeagent
+  profile_nodeagent:
+    state: 	absent
+    wasdir: /usr/local/WebSphere/AppServer/
+    name:		nodeagent
+
+- name: Purge
+  profile_nodeagent:
+    state: 				purge
+    wasdir: 			/usr/local/WebSphere/AppServer/
+    profile_dir: 	/usr/local/WebSphereProfiles
+    name: 				nodeagent
 ```
 
 ### server.py
@@ -166,15 +180,15 @@ This module start or stops a WebSphere Application Server
 #### Example
 ```yaml
 - name: Start
-  server: 
-    state: started 
-    wasdir: /usr/local/WebSphere/AppServer/ 
+  server:
+    state: started
+    wasdir: /usr/local/WebSphere/AppServer/
     name: my-server-01
 
 - name: Stop
-  server: 
-    state: stopped 
-    wasdir: /usr/local/WebSphere/AppServer/ 
+  server:
+    state: stopped
+    wasdir: /usr/local/WebSphere/AppServer/
     name: my-server-01
 ```
 
@@ -191,15 +205,15 @@ This module start or stops a Liberty Profile server
 #### Example
 ```yaml
 - name: Start
-  liberty_server: 
-    state: started 
-    libertydir: /usr/local/WebSphere/Liberty/ 
+  liberty_server:
+    state: started
+    libertydir: /usr/local/WebSphere/Liberty/
     name: my-server-01
 
 - name: Stop
-  liberty_server: 
-    state: stopped 
-    libertydir: /usr/local/WebSphere/Liberty/ 
+  liberty_server:
+    state: stopped
+    libertydir: /usr/local/WebSphere/Liberty/
     name: my-server-01
 ```
 
@@ -216,14 +230,14 @@ This module creates or removes a Liberty Profile server runtime
 #### Example
 ```yaml
 - name: Create
-  profile_liberty: 
-    state: present 
-    libertydir: /usr/local/WebSphere/Liberty/ 
+  profile_liberty:
+    state: present
+    libertydir: /usr/local/WebSphere/Liberty/
     name: server01
 
 - name: Remove
-  profile_liberty: 
-    state: absent 
-    libertydir: /usr/local/WebSphere/Liberty/ 
+  profile_liberty:
+    state: absent
+    libertydir: /usr/local/WebSphere/Liberty/
     name: server01
 ```
