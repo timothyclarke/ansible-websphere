@@ -136,33 +136,33 @@ Note wasdir and profile_dir can end with or without a slash
 ```yaml
 - name: Create
   profile_nodeagent:
-    state: 					present
-    wasdir: 				/usr/local/WebSphere/AppServer
-    profile_dir: 		/usr/local/WebSphereProfiles/
-    profile_name: 	nodeagent
-    cell_name: 			devCellTmp
-    host_name: 			localhost
-    node_name: 			devcell-node1
-    username: 			admin
-    password: 			allyourbasearebelongtous
-    dmgr_host: 			localhost
-    dmgr_port: 			8879
-    federate: 			'true'
+    state:          present
+    wasdir:         /usr/local/WebSphere/AppServer
+    profile_dir:    /usr/local/WebSphereProfiles/
+    profile_name:   nodeagent
+    cell_name:      devCellTmp
+    host_name:      localhost
+    node_name:      devcell-node1
+    username:       admin
+    password:       allyourbasearebelongtous
+    dmgr_host:      localhost
+    dmgr_port:      8879
+    federate:       'true'
     template_name:  managed
     admin_security: 'true'
 
 - name: Remove
   profile_nodeagent:
-    state: 	absent
+    state:  absent
     wasdir: /usr/local/WebSphere/AppServer/
-    name:		nodeagent
+    name:   nodeagent
 
 - name: Purge
   profile_nodeagent:
-    state: 				purge
-    wasdir: 			/usr/local/WebSphere/AppServer/
-    profile_dir: 	/usr/local/WebSphereProfiles
-    name: 				nodeagent
+    state:        purge
+    wasdir:       /usr/local/WebSphere/AppServer/
+    profile_dir:  /usr/local/WebSphereProfiles
+    name:         nodeagent
 ```
 
 ### server.py
